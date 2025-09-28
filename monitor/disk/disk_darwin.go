@@ -70,7 +70,7 @@ func getDarwinDisks() ([]DiskInfo, error) {
 // parseDfLine 解析df命令输出行
 func parseDfLine(line string) *DiskInfo {
 	fields := strings.Fields(line)
-	if len(fields) < 6 {
+	if len(fields) < 8 {
 		return nil
 	}
 
@@ -93,7 +93,8 @@ func parseDfLine(line string) *DiskInfo {
 	used *= 1024
 	available *= 1024
 
-	mountpoint := fields[5]
+	// 挂载点在最后一个字段
+	mountpoint := fields[len(fields)-1]
 
 	return &DiskInfo{
 		Device:     filesystem,
