@@ -70,7 +70,7 @@ func getDarwinDisks() ([]DiskInfo, error) {
 // parseDfLine 解析df命令输出行
 func parseDfLine(line string) *DiskInfo {
 	fields := strings.Fields(line)
-	if len(fields) < 8 {
+	if len(fields) < 9 {
 		return nil
 	}
 
@@ -83,6 +83,10 @@ func parseDfLine(line string) *DiskInfo {
 		return nil
 	}
 
+	// macOS df -k 输出格式:
+	// Filesystem 1024-blocks Used Available Capacity iused ifree %iused Mounted on
+	// 字段索引:  0          1         2    3         4        5     6     7      8
+	
 	// 解析数值 (df -k 输出的是1K blocks)
 	total, _ := strconv.ParseUint(fields[1], 10, 64)
 	used, _ := strconv.ParseUint(fields[2], 10, 64)
@@ -93,8 +97,8 @@ func parseDfLine(line string) *DiskInfo {
 	used *= 1024
 	available *= 1024
 
-	// 挂载点在最后一个字段
-	mountpoint := fields[len(fields)-1]
+	// 挂载点在第8个字段（索引8）
+	mountpoint := fields[8]
 
 	return &DiskInfo{
 		Device:     filesystem,
